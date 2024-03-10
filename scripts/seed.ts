@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 
 import { seedAnimalHospital } from './model/animalHospital'
+import { generateCreatePets } from './model/pet'
 import { seedTheme } from './model/theme'
 import { seedUser } from './model/user'
 
@@ -13,9 +14,15 @@ const reset = async () => {
   await prismadb['theme'].deleteMany()
 }
 const seed = async () => {
-  await seedUser()
+  console.log('seeding...')
+  const userId = await seedUser()
+  console.log('userId', userId)
+  await generateCreatePets(200, userId)
+  console.log('pet count', await prismadb.pet.count())
   await seedAnimalHospital()
+  console.log('animalHospital count', await prismadb.animalHospital.count())
   await seedTheme()
+  console.log('theme count', await prismadb.theme.count())
 }
 
 async function main() {

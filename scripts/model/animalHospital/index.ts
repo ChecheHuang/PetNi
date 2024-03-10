@@ -20,7 +20,7 @@ const copyArr = <T>(array: T[], copyTime = 1): T[] => {
   return result
 }
 
-export const seedAnimalHospital = async (length = 2) => {
+export const seedAnimalHospital = async (length = 1) => {
   for (const _ of Array(length)) {
     await prismadb.animalHospital.createMany({
       data: animalHospital,

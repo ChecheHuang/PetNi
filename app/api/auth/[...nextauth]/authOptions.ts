@@ -100,6 +100,8 @@ export const authOptions: AuthOptions = {
     redirect() {
       return '/deliver'
     },
+   
+    
   },
 }
 

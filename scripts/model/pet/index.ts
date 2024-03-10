@@ -1,4 +1,5 @@
 import { Pet } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 
 import {
   genderOptions,
@@ -7,6 +8,7 @@ import {
   catFurColorOptions,
   ageOptions,
 } from '@/config/options'
+import prismadb from '@/lib/prismadb'
 
 export const defaultPets = [
   {
@@ -82,7 +84,7 @@ function generateRandomPhoneNumber() {
   return `${prefix}${paddedNumber}`
 }
 
-function createRandomCatGenerator() {
+function createRandomCatGenerator(userId: string) {
   let count = 0
   return async function getRandomCatImage() {
     const response = await fetch('https://api.thecatapi.com/v1/images/search')
@@ -113,10 +115,11 @@ function createRandomCatGenerator() {
       area,
       description,
       isPublish,
+      userId,
     } as Pet
   }
 }
-function createRandomDogGenerator() {
+function createRandomDogGenerator(userId: string) {
   let count = 0
   return async function getRandomDogImage() {
     const response = await fetch('https://dog.ceo/api/breeds/image/random')
@@ -148,20 +151,20 @@ function createRandomDogGenerator() {
       area,
       description,
       isPublish,
+      userId,
     } as Pet
   }
 }
 
-export async function generateCreatePets(length: number) {
-  const getRandomCat = createRandomCatGenerator()
-  const getRandomDog = createRandomDogGenerator()
+export async function generateCreatePets(length: number, userId: string) {
+  const getRandomCat = createRandomCatGenerator(userId)
+  const getRandomDog = createRandomDogGenerator(userId)
   const pets = [] as Pet[]
   for (let i = 0; i < length; i++) {
     const pet =
       Math.random() < 0.5 ? await getRandomCat() : await getRandomDog()
     pets.push(pet)
   }
-  return {
-    create: pets,
-  }
+
+  await prismadb.pet.createMany({ data: pets })
 }
