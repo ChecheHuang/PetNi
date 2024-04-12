@@ -17,7 +17,7 @@ const seed = async () => {
   console.log('seeding...')
   const userId = await seedUser()
   console.log('userId', userId)
-  await generateCreatePets(200, userId)
+  await generateCreatePets(90, userId)
   console.log('pet count', await prismadb.pet.count())
   await seedAnimalHospital()
   console.log('animalHospital count', await prismadb.animalHospital.count())

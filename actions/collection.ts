@@ -7,25 +7,24 @@ export const getCollections = async () => {
   const session = await getUserAuth()
   if (!session) throw new Error('Unauthorized')
   const userId = session.user.id as string
-  const collections = (
-    await prismadb.collection.findMany({
-      where: {
-        userId,
-      },
-      select: {
-        pet: {
-          select: {
-            id: true,
-            name: true,
-            imageUrl: true,
-            city: true,
-            area: true,
-            gender: true,
-          },
+  const query = await prismadb.collection.findMany({
+    where: {
+      userId,
+    },
+    select: {
+      pet: {
+        select: {
+          id: true,
+          name: true,
+          imageUrl: true,
+          city: true,
+          area: true,
+          gender: true,
         },
       },
-    })
-  ).map(({ pet }) => pet)
+    },
+  })
+  const collections = query.map(({ pet }) => pet)
   return collections
 }
 export type GetCollectionsReturnType = GetArrType<

@@ -41,26 +41,29 @@ function Main({ userId }: { userId?: string }) {
     )
   const pairPets = data?.pages.flatMap((page) => page.pairPets) || []
 
-  // useEffect(() => {
-  //   if (!isLogin) return
-  //   ;(async () => {
-  //     if (!storage.get('collections')) return
+  useEffect(() => {
+    if (!isLogin) return
+    ;(async () => {
+      if (!storage.get('collections')) return
 
-  //     const collections: GetCollectionsReturnType[] =
-  //       storage.get('collections') || []
+      const collections: GetCollectionsReturnType[] =
+        storage.get('collections') || []
 
-  //     await Promise.all(
-  //       collections.map(async (item) => {
-  //         trpcClient.collection.createCollection.mutate({
-  //           petId: item.id,
-  //           isLike: true,
-  //         })
-  //       }),
-  //     )
-  //     storage.remove('collections')
-  //     refetch()
-  //   })()
-  // }, [isLogin, refetch])
+      // console.log(collections)
+      console.log('123')
+      return
+      await Promise.all(
+        collections.map(async (item) => {
+          trpcClient.collection.createCollection.mutate({
+            petId: item.id,
+            isLike: true,
+          })
+        }),
+      )
+      storage.remove('collections')
+      refetch()
+    })()
+  }, [isLogin, refetch])
 
   if (isLoading)
     return (
