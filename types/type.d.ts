@@ -11,3 +11,6 @@ type GetArrType<T> = T extends (infer U)[] ? U : never
 type Prettify<T> = {
   [K in keyof T]: T[K]
 }
+type Prettify2<T> = {
+  [K in keyof T]: T[K] extends object ? Prettify<T[K]> : T[K];
+}
