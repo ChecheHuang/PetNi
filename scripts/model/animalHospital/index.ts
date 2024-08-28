@@ -26,5 +26,4 @@ export const seedAnimalHospital = async (length = 1) => {
       data: animalHospital,
     })
   }
-  console.log('animalHospital count', await prismadb.animalHospital.count())
 }
