@@ -23,6 +23,11 @@ const nextConfig = {
         hostname: '24.media.tumblr.com',
         pathname: '**',
       },
+      {
+        protocol: 'https',
+        hostname: '28.media.tumblr.com',
+        pathname: '**',
+      },
     ],
   },
 }
