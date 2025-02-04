@@ -5,7 +5,7 @@ import { useUploadThing } from '@/lib/uploadthing'
 export const useUpload = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false)
   const [uploadProgress, setUploadProgress] = useState<number>(0)
-  const { startUpload } = useUploadThing('image')
+  const { startUpload } = useUploadThing('imageUploader')
 
   const startSimulatedProgress = () => {
     setUploadProgress(0)

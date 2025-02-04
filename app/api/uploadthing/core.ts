@@ -1,35 +1,52 @@
-import { createUploadthing, type FileRouter } from 'uploadthing/next'
-
+import { createUploadthing, type FileRouter } from "uploadthing/next";
+import { UploadThingError } from "uploadthing/server";
 import { getUserAuth } from '@/app/api/auth/[...nextauth]/authOptions'
 
-const f = createUploadthing()
+const f = createUploadthing();
 
-const middleware = async () => {
-  const session = await getUserAuth()
+const auth = (req: Request) => ({ id: "fakeId" }); // Fake auth function
 
-  if (!session || !session.user.id) throw new Error('Unauthorized')
-  return { userId: session.user.id }
-}
-const onUploadComplete = async ({
-  metadata,
-  file,
-}: {
-  metadata: Awaited<ReturnType<typeof middleware>>
-  file: {
-    key: string
-    name: string
-    url: string
-  }
-}) => {
-  console.log('Upload complete for userId:', metadata.userId)
-  console.log('file url', file.url)
-  return { uploadedBy: metadata.userId }
-}
-
+// FileRouter for your app, can contain multiple FileRoutes
 export const ourFileRouter = {
-  image: f({ image: { maxFileSize: '4MB', maxFileCount: 1 } })
-    .middleware(middleware)
-    .onUploadComplete(onUploadComplete),
-} satisfies FileRouter
+  // Define as many FileRoutes as you like, each with a unique routeSlug
+  imageUploader: f({
+    image: {
+      /**
+       * For full list of options and defaults, see the File Route API reference
+       * @see https://docs.uploadthing.com/file-routes#route-config
+       */
+      maxFileSize: "4MB",
+      maxFileCount: 1,
+    },
+  })
+    // Set permissions and file types for this FileRoute
+    .middleware(async ({ req }) => {
 
-export type OurFileRouter = typeof ourFileRouter
+
+      const session = await getUserAuth()
+
+      if (!session || !session.user.id) throw new UploadThingError('Unauthorized')
+      return { userId: session.user.id }
+
+
+      // This code runs on your server before upload
+      const user = await auth(req);
+
+      // If you throw, the user will not be able to upload
+      if (!user) throw new UploadThingError("Unauthorized");
+
+      // Whatever is returned here is accessible in onUploadComplete as `metadata`
+      return { userId: user.id };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {
+      // This code RUNS ON YOUR SERVER after upload
+      console.log("Upload complete for userId:", metadata.userId);
+
+      console.log("file url", file.url);
+
+      // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
+      return { uploadedBy: metadata.userId };
+    }),
+} satisfies FileRouter;
+
+export type OurFileRouter = typeof ourFileRouter;
